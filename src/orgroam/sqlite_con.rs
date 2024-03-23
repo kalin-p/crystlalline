@@ -1,9 +1,7 @@
-// from this tutorial: https://www.youtube.com/watch?v=8EBsOZPGZn8
+use sqlx::{sqlite::SqlitePool, Row, Column, sqlite::SqliteRow};
+use super::types::Link;
 
-
-use sqlx::{sqlite::SqlitePool, Row, Column};
-
-pub const DB_PATH: &str = "/home/kalin/.emacs.d/org-roam.db";
+pub const DB_PATH: &str = "sqlite:///home/kalin/.emacs.d/org-roam.db";
 
 pub async fn open_connection(path: &str) {
     // let path = Path::new(path);
@@ -11,18 +9,26 @@ pub async fn open_connection(path: &str) {
     match pool {
         Ok(pool) => {
             // pool.acquire();
-            let rows = sqlx::query("select source, dest, type from links")
+            let links: Vec<Link> = sqlx::query_as!(
+                Link,
+                r#"select * from links"#)
                 .fetch_all(&pool).await.unwrap();
-            for row in rows {
-                // let source = row.get("source");
-                // let dest = row.get("dest");
-                // let link_type = row.get("type");
-                let cols = row.columns();
-                let vals: String = row.try_get(0).unwrap();
+            // for row in rows {
+            //     // let source = row.get("source");
+            //     // let dest = row.get("dest");
+            //     // let link_type = row.get("type");
+            //     let cols = row.columns();
+            //     for col in cols {
+            //         let val = row.try_get(col.ordinal()).unwrap();
+            //         println!("{:?}: {:?}",col.name(), val);
+            //     }
+            for l in links {
+                println!("{:?}", l);
+            }                
                 // println!("source: {},\ndest: {},\ntype: {}", source, dest, link_type );
-                
-                println!("{:?}, {:?}", cols[0].name(), vals);
-            }
+
+                // println!("{:?}", cols);
+                // println!("{:?}, {:?}", cols[0].name(), vals);
             // println!("{:?}", pool)
         },
         Err(e) => println!("printing error: {}", e) 
