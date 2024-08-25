@@ -1,8 +1,8 @@
 use sqlx::sqlite::SqlitePool;
 use super::types::*;
 
-pub const DB_PATH: &str = "sqlite:///home/kalin/.emacs.d/org-roam.db";
-pub const DEV_DB_PATH: &str = "sqlite:///data/graph_viz/src/orgroam/dev-org-roam.db";
+// pub const DB_PATH: &str = "sqlite:///home/kalin/.emacs.d/org-roam.db";
+pub const DEV_DB_PATH: &str = "sqlite:///data/crystalline/dev-org-roam.db";
 
 pub async fn get_all_links(pool: &SqlitePool) -> Vec<Link> {
     // let path = Path::new(path);

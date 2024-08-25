@@ -1,0 +1,6 @@
+[database]
+profile = "dev"
+
+[database.dev]
+proto = "sqlite"
+path = "./dev-org-roam.db"
