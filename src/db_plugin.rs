@@ -3,6 +3,7 @@ use dotenvy::dotenv;
 use sqlx::sqlite::SqlitePool;
 use std::env;
 use async_std::task::block_on;
+use super::orgroam::sqlite_con::*;
 
 #[derive(Resource)]
 struct DBConnection {
@@ -28,6 +29,15 @@ impl DBConnection {
     }
 }
 
+fn query_db_system (db_conn: Res<DBConnection>, kbd: Res<ButtonInput<KeyCode>>) {
+    if kbd.just_pressed(KeyCode::Space) {
+        let nodes = block_on(get_all_nodes(&db_conn.pool));
+        for node in nodes {
+            println!("{:?}", node);
+        }
+    }
+}
+
 pub struct DBPlugin;
 
 impl Plugin for DBPlugin {
@@ -37,6 +47,7 @@ impl Plugin for DBPlugin {
         match conn {
             Some(pool) => {
                 app.insert_resource(pool);
+                app.add_systems(Update, query_db_system);
             },
             _ => {
                 println!("could not obtain SQLite resource.");
@@ -45,3 +56,4 @@ impl Plugin for DBPlugin {
 
     }
 }
+
