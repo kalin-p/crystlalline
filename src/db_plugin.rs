@@ -4,6 +4,8 @@ use sqlx::sqlite::SqlitePool;
 use std::env;
 use async_std::task::block_on;
 use super::orgroam::sqlite_con::*;
+use sexp::*;
+use sexp::Atom;
 
 #[derive(Resource)]
 struct DBConnection {
@@ -31,10 +33,52 @@ impl DBConnection {
 
 fn query_db_system (db_conn: Res<DBConnection>, kbd: Res<ButtonInput<KeyCode>>) {
     if kbd.just_pressed(KeyCode::Space) {
-        let nodes = block_on(get_all_nodes(&db_conn.pool));
-        for node in nodes {
-            println!("{:?}", node);
+        // let nodes = block_on(get_all_nodes(&db_conn.pool));
+        // for node in nodes {
+        //     println!("{:?}", node);
+        // }
+
+        let n = block_on(get_one_node(&db_conn.pool));
+        match n.properties {
+            Some(props) => {
+                let parsed_props = parse(props.as_str()).ok().unwrap();
+                match parsed_props {
+                    Sexp::List(data1) => {
+                        for d in data1 {
+                            match d {
+                                Sexp::List(cons) => {
+                                    let conscopy = cons.clone();
+                                    match &cons[0] {
+                                        Sexp::Atom(p) => {
+                                            match &p {
+                                                Atom::S(pname) => {
+                                                    if *pname == "ALLTAGS".to_string() {
+                                                        for a in &cons {
+                                                            println!("{:?}", a);
+                                                        }
+                                                    }
+                                                },
+                                                _ => {}
+                                            }
+                                        },
+                                        _ => {}
+                                    }
+                                },
+                                _ => {}
+                            }
+                        }
+                    },
+                    _ => {}
+                }
+            },
+            None => {
+                println!("Node properties not found.");
+            }
         }
+
+        // let specific_id = String::from("'\"37e91eab-7baa-42e2-995d-d3cd606c3526\"'");
+        // println!("{}", specific_id);
+        // println!(r#"select * from nodes where title = "2024-03-28"' "#)
     }
 }
 
