@@ -21,6 +21,16 @@ pub async fn get_all_nodes(pool: &SqlitePool) -> Vec<Node> {
     nodes
 }
 
+pub async fn get_one_node(pool: &SqlitePool) -> Node {
+    let specific_id = String::from("'37e91eab-7baa-42e2-995d-d3cd606c3526'");
+    let specific_title = String::from("\"2024-03-28\"");
+    let node: Node = sqlx::query_as!(
+        Node,
+        r#"select * from nodes where id = '"37e91eab-7baa-42e2-995d-d3cd606c3526"'"#)
+        .fetch_one(pool).await.unwrap();
+    node
+}
+
 pub async fn get_all_refs(pool: &SqlitePool) -> Vec<Ref> {
     let refs: Vec<Ref> = sqlx::query_as!(
         Ref,
