@@ -13,6 +13,9 @@ use bevy::prelude::*;
 
 use config::{Config, File, FileFormat};
 
+use orgroam::emacs_reader::testdata::TESTDATA;
+use orgroam::emacs_reader::reader::SexpTree;
+use std::rc::Rc;
 
 // #[tokio::main]
 // async fn main() {
@@ -45,8 +48,30 @@ fn main() {
     //     }
     // }
     
-    App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugins(DBPlugin)
-        .run();
+    // App::new()
+    //     .add_plugins(DefaultPlugins)
+    //     .add_plugins(DBPlugin)
+    //     .run();
+    
+    let root = SexpTree::parse_from_string_v1(TESTDATA[0].to_string());
+
+    match &root.borrow_mut().children {
+        Some(v) => {
+            let first_node = Rc::clone(&v[0]);
+            match &first_node.borrow_mut().children {
+                Some(v) => {
+                    // for c in v {
+                    //     println!("{:?}\n", c.borrow().repr.clone().unwrap())
+                    // }
+                    println!("{:?}", v.len());
+                },
+                _ => {}
+            }
+            drop(first_node);
+        },
+        _ => {}
+    }
+
+    
+    drop(root);
 }
